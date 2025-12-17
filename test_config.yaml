@@ -1,0 +1,22 @@
+output_file: result.csv
+
+## model config
+
+model_config:
+  model: deepseek-v3
+  url: http://10.119.194.202:8000/v1/chat/completions
+  api: openai
+  api_key: sk-1e1b3bec65824ecc818d1cb0ff30f3e1
+  tokenizer_path: /workspace/models/DeepSeek-V3.1-Terminus
+
+
+eval_config:
+  ### 
+  number: [1, 2, 4]
+  concurrency: [1, 2, 4]
+  rate: 2
+
+  input_tokens: [128, 256, 512]
+  output_tokens: [128, 256, 512]
+  prefix_length: 100
+
