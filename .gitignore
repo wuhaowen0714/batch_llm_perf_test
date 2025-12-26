@@ -1,0 +1,35 @@
+# 环境变量（本地配置）
+*.env.local
+*.env.secret
+
+# 日志文件
+*.log
+*.log.*
+nohup.out
+
+# 临时文件
+*.tmp
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# 备份文件
+*.backup
+*.bak
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# 测试文件
+*.csv

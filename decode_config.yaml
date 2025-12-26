@@ -1,0 +1,27 @@
+output_file: decode_result.csv
+
+## 测试模式: all, prefill, decode
+## all: 记录所有指标
+## prefill: 记录 input_tokens, rate, number, ttft input_token_throughput
+## decode: 记录 input_tokens, prefix_length, output_tokens, tpot concurrency, number, output_token_throughput
+mode: decode
+
+## model config
+
+model_config:
+  model: glm47
+  url: http://10.120.177.211:8000/v1/chat/completions
+  api: openai
+  api_key: sk-1e1b3bec65824ecc818d1cb0ff30f3e1
+  tokenizer_path: /home/user/data/models/GLM-4.7-FP8
+
+
+eval_config:
+  ### 
+  number: [80,160,320,640,2560]
+  concurrency: [8, 16,32, 64, 256]
+  rate: -1
+
+  input_tokens: [1024]
+  output_tokens: [1024]
+  prefix_length: [1020]

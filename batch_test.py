@@ -128,7 +128,30 @@ def clean_outputs_folder(outputs_dir='outputs'):
             print(f"  警告: 清理 {outputs_dir} 失败: {e}")
 
 
-def write_to_csv(output_file, test_params, metrics, is_new_file):
+def get_fieldnames_by_mode(mode):
+    """根据mode获取对应的CSV字段名
+    
+    Args:
+        mode: 测试模式 ('all', 'prefill', 'decode')
+    
+    Returns:
+        字段名列表
+    """
+    if mode == 'prefill':
+        return ['input_tokens', 'rate', 'number', 'ttft', 'p90_ttft', 'input_token_throughput']
+    elif mode == 'decode':
+        return ['input_tokens', 'prefix_length', 'output_tokens', 'tpot', 'p90_tpot', 
+                'concurrency', 'number', 'output_token_throughput']
+    else:  # 'all' 或默认
+        return [
+            'input_tokens', 'prefix_length', 'output_tokens', 
+            'rate', 'concurrency', 'number',
+            'ttft', 'p90_ttft', 'tpot', 'p90_tpot',
+            'input_token_throughput', 'output_token_throughput'
+        ]
+
+
+def write_to_csv(output_file, test_params, metrics, is_new_file, mode='all'):
     """将测试结果写入CSV文件
     
     Args:
@@ -136,15 +159,12 @@ def write_to_csv(output_file, test_params, metrics, is_new_file):
         test_params: 测试参数字典
         metrics: 提取的指标字典
         is_new_file: 是否是新文件（需要写表头）
+        mode: 测试模式 ('all', 'prefill', 'decode')
     """
-    fieldnames = [
-        'input_tokens', 'prefix_length', 'output_tokens', 
-        'rate', 'concurrency', 'number',
-        'ttft', 'p90_ttft', 'tpot', 'p90_tpot',
-        'input_token_throughput', 'output_token_throughput'
-    ]
+    fieldnames = get_fieldnames_by_mode(mode)
     
-    row = {
+    # 构建完整的数据行
+    full_row = {
         'input_tokens': test_params['input_tokens'],
         'prefix_length': test_params['prefix_length'],
         'output_tokens': test_params['output_tokens'],
@@ -154,8 +174,11 @@ def write_to_csv(output_file, test_params, metrics, is_new_file):
         **metrics
     }
     
-    mode = 'w' if is_new_file else 'a'
-    with open(output_file, mode, newline='') as csvfile:
+    # 只保留当前mode需要的字段
+    row = {k: full_row[k] for k in fieldnames}
+    
+    file_mode = 'w' if is_new_file else 'a'
+    with open(output_file, file_mode, newline='') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         if is_new_file:
             writer.writeheader()
@@ -174,6 +197,9 @@ def run_auto_test(config_path):
     output_file = config['output_file']
     model_config = config['model_config']
     eval_config = config['eval_config']
+    test_mode = config.get('mode', 'all')  # 默认为 'all' 模式
+    
+    print(f"测试模式: {test_mode}")
     
     # 检查输出文件是否存在
     is_new_file = not os.path.exists(output_file)
@@ -240,7 +266,7 @@ def run_auto_test(config_path):
                 metrics = extract_result_metrics(results)
                 
                 # 写入CSV
-                write_to_csv(output_file, test_params, metrics, is_new_file)
+                write_to_csv(output_file, test_params, metrics, is_new_file, test_mode)
                 is_new_file = False  # 第一次写入后，后续都是追加
                 
                 print(f"  ✓ 测试完成，结果已写入 {output_file}")

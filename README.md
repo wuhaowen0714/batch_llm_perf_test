@@ -15,6 +15,9 @@
 ```yaml
 output_file: result.csv  # 输出CSV文件名
 
+# 测试模式: all, prefill, decode
+mode: all
+
 # 模型配置
 model_config:
   model: deepseek-v3
@@ -35,6 +38,28 @@ eval_config:
   output_tokens: 1024  # 输出长度
   prefix_length: 0  # 前缀长度
 ```
+
+## 测试模式 (mode)
+
+程序支持三种测试模式，用于记录不同的性能指标：
+
+| 模式 | 说明 | 适用场景 |
+|------|------|----------|
+| `all` | 记录所有指标（默认） | 完整性能分析 |
+| `prefill` | 只记录预填充阶段相关指标 | 测试首token延迟和输入处理能力 |
+| `decode` | 只记录解码阶段相关指标 | 测试生成速度和输出吞吐量 |
+
+### 各模式输出字段
+
+**all 模式**：
+- input_tokens, prefix_length, output_tokens, rate, concurrency, number
+- ttft, p90_ttft, tpot, p90_tpot, input_token_throughput, output_token_throughput
+
+**prefill 模式**：
+- input_tokens, rate, number, ttft, p90_ttft, input_token_throughput
+
+**decode 模式**：
+- input_tokens, prefix_length, output_tokens, tpot, p90_tpot, concurrency, number, output_token_throughput
 
 ## 参数对齐规则
 
@@ -58,22 +83,22 @@ eval_config:
 
 ## CSV输出格式
 
-输出的CSV文件包含以下列：
+输出的CSV文件根据 `mode` 设置包含不同的列。以下是 `all` 模式下的完整列说明：
 
-| 列名 | 说明 | 来源 |
-|------|------|------|
-| input_tokens | 输入token数量 | 配置文件 |
-| prefix_length | 前缀长度 | 配置文件 |
-| output_tokens | 输出token数量 | 配置文件 |
-| rate | 请求速率 | 配置文件 |
-| concurrency | 并发数 | 配置文件 |
-| number | 总请求数 | 配置文件 |
-| ttft | 平均首token时间(秒) | Average time to first token |
-| p90_ttft | 90分位首token时间(秒) | Percentiles TTFT 90% |
-| tpot | 平均每token时间(秒) | Average time per output token |
-| p90_tpot | 90分位每token时间(秒) | Percentiles TPOT 90% |
-| input_token_throughput | 输入token吞吐量(tok/s) | Total - Output throughput |
-| output_token_throughput | 输出token吞吐量(tok/s) | Output token throughput |
+| 列名 | 说明 | 来源 | all | prefill | decode |
+|------|------|------|:---:|:-------:|:------:|
+| input_tokens | 输入token数量 | 配置文件 | ✓ | ✓ | ✓ |
+| prefix_length | 前缀长度 | 配置文件 | ✓ | | ✓ |
+| output_tokens | 输出token数量 | 配置文件 | ✓ | | ✓ |
+| rate | 请求速率 | 配置文件 | ✓ | ✓ | |
+| concurrency | 并发数 | 配置文件 | ✓ | | ✓ |
+| number | 总请求数 | 配置文件 | ✓ | ✓ | ✓ |
+| ttft | 平均首token时间(秒) | Average time to first token | ✓ | ✓ | |
+| p90_ttft | 90分位首token时间(秒) | Percentiles TTFT 90% | ✓ | ✓ | |
+| tpot | 平均每token时间(秒) | Average time per output token | ✓ | | ✓ |
+| p90_tpot | 90分位每token时间(秒) | Percentiles TPOT 90% | ✓ | | ✓ |
+| input_token_throughput | 输入token吞吐量(tok/s) | Total - Output throughput | ✓ | ✓ | |
+| output_token_throughput | 输出token吞吐量(tok/s) | Output token throughput | ✓ | | ✓ |
 
 ## 使用方法
 
@@ -83,6 +108,7 @@ pip install evalscope pyyaml
 ```
 
 2. 编辑配置文件 `test_config.yaml`，设置：
+   - 测试模式 (`mode`: all/prefill/decode)
    - 模型访问参数
    - 测试参数组合
    - 输出文件名
@@ -172,4 +198,32 @@ eval_config:
   prefix_length: 0
 ```
 总测试数：3 × 2 = 6
+
+### 示例5：Prefill模式测试（测试首token延迟）
+```yaml
+mode: prefill
+
+eval_config:
+  number: [1000, 2000]
+  concurrency: [1000, 2000]
+  rate: 50
+  input_tokens: [1024, 2048, 4096]
+  output_tokens: 1  # prefill模式下output_tokens通常设为1
+  prefix_length: 0
+```
+输出字段：input_tokens, rate, number, ttft, p90_ttft, input_token_throughput
+
+### 示例6：Decode模式测试（测试生成速度）
+```yaml
+mode: decode
+
+eval_config:
+  number: 100
+  concurrency: [8, 16, 32]
+  rate: -1
+  input_tokens: 1024
+  output_tokens: [512, 1024, 2048]
+  prefix_length: 0
+```
+输出字段：input_tokens, prefix_length, output_tokens, tpot, p90_tpot, concurrency, number, output_token_throughput
 
