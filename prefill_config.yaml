@@ -2,7 +2,7 @@ output_file: prefill_result.csv
 
 ## 测试模式: all, prefill, decode
 ## all: 记录所有指标
-## prefill: 记录 input_tokens, rate, number, ttft, p90_ttft, input_token_throughput
+## prefill: 记录 input_tokens, output_tokens, concurrency, number, ttft, p90_ttft, input_token_throughput
 ## decode: 记录 input_tokens, prefix_length, output_tokens, tpot, p90_tpot, concurrency, number, output_token_throughput
 mode: prefill
 
@@ -10,7 +10,7 @@ mode: prefill
 
 model_config:
   model: deepseek-v3
-  url: http://10.120.177.217:30000/v1/chat/completions
+  url: http://10.120.177.208:8000/v1/chat/completions
   api: openai
   api_key: sk-1e1b3bec65824ecc818d1cb0ff30f3e1
   tokenizer_path: /home/user/data/models/GLM-4.7-FP8
@@ -18,9 +18,9 @@ model_config:
 
 eval_config:
   ### 
-  number: [2000]
-  concurrency: [2000]
-  rate: [10, 20, 30]
+  number: [1]
+  concurrency: [1]
+  rate: -1
 
   input_tokens: [512, 1024]
   output_tokens: [1]

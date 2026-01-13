@@ -2,7 +2,7 @@ output_file: result.csv
 
 ## 测试模式: all, prefill, decode
 ## all: 记录所有指标
-## prefill: 记录 input_tokens, rate, number, ttft, p90_ttft, input_token_throughput
+## prefill: 记录 input_tokens, output_tokens, concurrency, number, ttft, p90_ttft, input_token_throughput
 ## decode: 记录 input_tokens, prefix_length, output_tokens, tpot, p90_tpot, concurrency, number, output_token_throughput
 mode: all
 

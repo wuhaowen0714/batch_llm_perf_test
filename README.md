@@ -56,7 +56,7 @@ eval_config:
 - ttft, p90_ttft, tpot, p90_tpot, input_token_throughput, output_token_throughput
 
 **prefill 模式**：
-- input_tokens, rate, number, ttft, p90_ttft, input_token_throughput
+- input_tokens, output_tokens, concurrency, number, ttft, p90_ttft, input_token_throughput
 
 **decode 模式**：
 - input_tokens, prefix_length, output_tokens, tpot, p90_tpot, concurrency, number, output_token_throughput
@@ -89,9 +89,9 @@ eval_config:
 |------|------|------|:---:|:-------:|:------:|
 | input_tokens | 输入token数量 | 配置文件 | ✓ | ✓ | ✓ |
 | prefix_length | 前缀长度 | 配置文件 | ✓ | | ✓ |
-| output_tokens | 输出token数量 | 配置文件 | ✓ | | ✓ |
-| rate | 请求速率 | 配置文件 | ✓ | ✓ | |
-| concurrency | 并发数 | 配置文件 | ✓ | | ✓ |
+| output_tokens | 输出token数量 | 配置文件 | ✓ | ✓ | ✓ |
+| rate | 请求速率 | 配置文件 | ✓ | | |
+| concurrency | 并发数 | 配置文件 | ✓ | ✓ | ✓ |
 | number | 总请求数 | 配置文件 | ✓ | ✓ | ✓ |
 | ttft | 平均首token时间(秒) | Average time to first token | ✓ | ✓ | |
 | p90_ttft | 90分位首token时间(秒) | Percentiles TTFT 90% | ✓ | ✓ | |
@@ -211,7 +211,7 @@ eval_config:
   output_tokens: 1  # prefill模式下output_tokens通常设为1
   prefix_length: 0
 ```
-输出字段：input_tokens, rate, number, ttft, p90_ttft, input_token_throughput
+输出字段：input_tokens, output_tokens, concurrency, number, ttft, p90_ttft, input_token_throughput
 
 ### 示例6：Decode模式测试（测试生成速度）
 ```yaml

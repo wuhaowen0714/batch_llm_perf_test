@@ -138,7 +138,7 @@ def get_fieldnames_by_mode(mode):
         字段名列表
     """
     if mode == 'prefill':
-        return ['input_tokens', 'rate', 'number', 'ttft', 'p90_ttft', 'input_token_throughput']
+        return ['input_tokens', 'output_tokens', 'concurrency', 'number', 'ttft', 'p90_ttft', 'input_token_throughput']
     elif mode == 'decode':
         return ['input_tokens', 'prefix_length', 'output_tokens', 'tpot', 'p90_tpot', 
                 'concurrency', 'number', 'output_token_throughput']
@@ -285,6 +285,10 @@ def run_auto_test(config_path):
 
 
 if __name__ == "__main__":
-    config_path = "test_config.yaml"
+    ## config 为输入参数
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--config", type=str, default="config.yaml", help="配置文件路径")
+    args = parser.parse_args()
+    config_path = args.config
     run_auto_test(config_path)
-
