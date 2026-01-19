@@ -10,19 +10,19 @@ mode: prefill
 
 model_config:
   model: deepseek-v3
-  url: http://10.120.177.208:8000/v1/chat/completions
+  url: http://127.0.0.1:30000/v1/chat/completions
   api: openai
   api_key: sk-1e1b3bec65824ecc818d1cb0ff30f3e1
-  tokenizer_path: /home/user/data/models/GLM-4.7-FP8
+  tokenizer_path: deepseek-ai/DeepSeek-V3.1-Terminus
 
 
 eval_config:
   ### 
-  number: [1]
-  concurrency: [1]
+  number: [10, 80, 160, 320, 640, 1280, 2560]
+  concurrency: [1, 8, 16, 32, 64, 128, 256]
   rate: -1
 
-  input_tokens: [512, 1024]
+  input_tokens: [1024]
   output_tokens: [1]
   prefix_length: [0]
 

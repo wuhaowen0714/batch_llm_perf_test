@@ -10,18 +10,18 @@ mode: decode
 
 model_config:
   model: glm47
-  url: http://10.120.177.211:8000/v1/chat/completions
+  url: http://127.0.0.1:30000/v1/chat/completions
   api: openai
   api_key: sk-1e1b3bec65824ecc818d1cb0ff30f3e1
-  tokenizer_path: /home/user/data/models/GLM-4.7-FP8
+  tokenizer_path: deepseek-ai/DeepSeek-V3.1-Terminus
 
 
 eval_config:
   ### 
-  number: [80,160,320,640,2560]
-  concurrency: [8, 16,32, 64, 256]
+  number: [320, 640, 960, 1280]
+  concurrency: [32, 64, 96, 128]
   rate: -1
 
   input_tokens: [1024]
-  output_tokens: [1024]
-  prefix_length: [1020]
+  output_tokens: [128, 1024]
+  prefix_length: [1016]

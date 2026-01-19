@@ -48,12 +48,25 @@ def extract_result_metrics(results):
     """从evalscope结果中提取指标
     
     Args:
-        results: evalscope返回的结果元组 (metrics_dict, percentiles_dict)
+        results: evalscope返回的结果
+            - 旧版本 (0.17.0): 元组 (metrics_dict, percentiles_dict)
+            - 新版本: 字典 {'parallel_X_number_Y': {'metrics': {...}, 'percentiles': {...}}}
     
     Returns:
         包含所需指标的字典
     """
-    metrics, percentiles = results
+    # 兼容两种格式
+    if isinstance(results, tuple):
+        # 旧版本格式: (metrics, percentiles)
+        metrics, percentiles = results
+    elif isinstance(results, dict):
+        # 新版本格式: {'parallel_X_number_Y': {'metrics': {...}, 'percentiles': {...}}}
+        # 获取第一个键对应的值
+        first_key = next(iter(results))
+        metrics = results[first_key]['metrics']
+        percentiles = results[first_key]['percentiles']
+    else:
+        raise ValueError(f"不支持的结果格式: {type(results)}")
     
     # 找到90%对应的索引
     percentile_labels = percentiles['Percentiles']
@@ -140,8 +153,8 @@ def get_fieldnames_by_mode(mode):
     if mode == 'prefill':
         return ['input_tokens', 'output_tokens', 'concurrency', 'number', 'ttft', 'p90_ttft', 'input_token_throughput']
     elif mode == 'decode':
-        return ['input_tokens', 'prefix_length', 'output_tokens', 'tpot', 'p90_tpot', 
-                'concurrency', 'number', 'output_token_throughput']
+        return ['input_tokens', 'prefix_length', 'output_tokens', 'concurrency', 'number', 'tpot', 'p90_tpot', 
+                'output_token_throughput']
     else:  # 'all' 或默认
         return [
             'input_tokens', 'prefix_length', 'output_tokens', 
